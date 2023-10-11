@@ -23,7 +23,6 @@ const MoviesDetailsPage = () => {
   const location = useLocation();
   const backLinkHref = location.state?.from ?? '/';
 
-  console.log(location);
   useEffect(() => {
     const fetchFilmDetails = async () => {
       try {
