@@ -14,6 +14,10 @@ export const TextWrapper = styled.div`
   gap: 20px;
 `;
 
+export const Image = styled.img`
+  object-fit: contain;
+`;
+
 export const Title = styled.h2`
   font-size: 30px;
 `;

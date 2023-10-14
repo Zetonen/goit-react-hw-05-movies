@@ -1,7 +1,9 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { fetchFilmCast } from 'api';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CardCharter, Name } from './Cast.styled';
+import { noMovieImage } from 'pages/MoviesDetailsPage';
 
 const Cast = () => {
   const [cast, setCast] = useState([]);
@@ -29,8 +31,12 @@ const Cast = () => {
             <CardCharter key={item.credit_id}>
               <img
                 width={150}
-                src={`https://image.tmdb.org/t/p/w500/${item.profile_path}`}
-                alt=""
+                src={
+                  item.profile_path
+                    ? `https://image.tmdb.org/t/p/w500/${item.profile_path}`
+                    : noMovieImage
+                }
+                alt={item.name}
               />
               <Name>{item.name}</Name>
               <p>Character: {item.character}</p>

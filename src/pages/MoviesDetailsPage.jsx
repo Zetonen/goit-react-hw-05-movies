@@ -11,26 +11,33 @@ import {
   LinkDetails,
   AdditionalTitle,
   ListLink,
+  Image,
 } from './MoveDetailsPage.styled';
 import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
-import noMovieImage from '../img/No-image-poster.png';
+import { Loader } from 'components/Loader/Loader';
+import { useRef } from 'react';
+export const noMovieImage =
+  'https://image.tmdb.org/t/p/w500/wwemzKWzjKYJFfCeiB57q3r4Bcm.png';
 
 const MoviesDetailsPage = () => {
   const [film, setFilm] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const { movieId } = useParams();
   const location = useLocation();
-  const backLinkHref = location.state?.from ?? '/';
+  const backLinkHref = useRef(location.state?.from ?? '/');
 
   useEffect(() => {
     const fetchFilmDetails = async () => {
       try {
         setLoading(true);
+        setError(false);
         const response = await fetchFilm(movieId);
         const filmDetails = response.data;
         setFilm(filmDetails);
       } catch (error) {
+        setError(true);
         console.log(error);
       } finally {
         setLoading(false);
@@ -44,19 +51,21 @@ const MoviesDetailsPage = () => {
     : 'no have rate';
   return (
     <div>
-      <Link to={backLinkHref}>Back</Link>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
+      <Link to={backLinkHref.current}>Back</Link>
+      {error && <p>Oops..Something went wrong...</p>}
+      {loading && <Loader />}
+      {film && (
         <>
           <Description>
-            {film ? <img
-              src={`https://image.tmdb.org/t/p/w500/${film?.backdrop_path}`}
+            <Image
+              src={
+                film?.backdrop_path
+                  ? `https://image.tmdb.org/t/p/w500/${film?.backdrop_path}`
+                  : noMovieImage
+              }
               alt={film?.title}
-            /> : <img
-            src={`https://image.tmdb.org/t/p/w500/${noMovieImage}`}
-            alt={film?.title ? film?.title : 'noMovie'}/>}
-            
+            />
+
             <TextWrapper>
               <Title>{film?.title}</Title>
               <p>{rate}</p>
@@ -81,7 +90,7 @@ const MoviesDetailsPage = () => {
               </li>
             </ListLink>
           </AdditionalDetails>
-          <Suspense fallback={<div>Loading subpage...</div>}>
+          <Suspense fallback={<Loader />}>
             <Outlet />
           </Suspense>
         </>

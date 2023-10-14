@@ -1,4 +1,5 @@
 import { handleSearch } from 'api';
+import { Loader } from 'components/Loader/Loader';
 import { MoviesList } from 'components/MoviesList/MoviesList';
 import { Field, Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
@@ -18,6 +19,8 @@ const quizSchema = Yup.object().shape({
 
 const MoviesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [films, setFilms] = useState([]);
   const search = searchParams.get('search');
   useEffect(() => {
@@ -27,10 +30,15 @@ const MoviesPage = () => {
         return;
       }
       try {
+        setLoading(true);
+        setError(false);
         const response = await handleSearch(search);
         setFilms(response);
       } catch (error) {
         console.log(error);
+        setError(true);
+      } finally {
+        setLoading(false);
       }
     };
     fetchFilm();
@@ -56,7 +64,10 @@ const MoviesPage = () => {
           <button type="submit">Submit</button>
         </StyledForm>
       </Formik>
-      {films ? <MoviesList items={films}></MoviesList> : null}
+      {loading && <Loader />}
+      {error && <p>Oops..Something went wrong...</p>}
+
+      {films.length > 0 && !loading ? <MoviesList items={films}></MoviesList> : null}
     </div>
   );
 };
